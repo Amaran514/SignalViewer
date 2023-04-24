@@ -113,13 +113,12 @@ void MainWindow::on_pushButtonReadFile_clicked()
             cfg_values.append(list[i].toInt());
         }
         int id = ui->lineEditId->text().toInt();
-        double freq_sine, amplitude;
+        double freq_sine = 0.0, amplitude = 0.0;
         for (int i = 0; i < cfg_values.size(); ++i) {
             if (cfg_values[i]==id) {
                 freq_sample = cfg_values[i+1];
                 freq_sine = cfg_values[i+2];
                 amplitude = cfg_values[i+3];
-                qDebug() << freq_sample << freq_sine << amplitude;
                 break;
             }
         }
