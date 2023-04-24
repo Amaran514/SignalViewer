@@ -22,6 +22,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEditId->setText(settings->value("Id/id").toString());
     ui->lineEditNoiseMean->setText(settings->value("Noise/mean").toString());
     ui->lineEditNoiseStd->setText(settings->value("Noise/standardDeviation").toString());
+    values.fill(0, 500); //  Fix crash when noise is added with no signal
+    freq_sample = 500;
+    datatype = 2;
+    display_mode = 0;
     series = new QLineSeries();
     chart = new QChart();
     chart->addSeries(series);

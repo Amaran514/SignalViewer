@@ -50,7 +50,7 @@ private:
     QVector<double> values;
     double freq_sample;
     int datatype;  // 0: int16, 1: uint32, 2: float
-    int display_mode = 0;  // 0: time, 1: freq
+    int display_mode;  // 0: time, 1: freq
 };
 
 #endif // MAINWINDOW_H
