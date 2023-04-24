@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>331</height>
+    <width>617</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>SignalViewer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,5">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,3,1,1">
         <item>
          <widget class="QGroupBox" name="groupBoxInput">
           <property name="title">
@@ -30,7 +30,7 @@
              <item>
               <widget class="QLabel" name="labelId">
                <property name="text">
-                <string>学号</string>
+                <string>学号:</string>
                </property>
               </widget>
              </item>
@@ -43,6 +43,66 @@
             <widget class="QPushButton" name="pushButtonReadFile">
              <property name="text">
               <string>打开文件</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxNoise">
+          <property name="title">
+           <string>高斯噪声</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="labelNoiseMean">
+               <property name="text">
+                <string>均值:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditNoiseMean"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QLabel" name="labelNoiseStd">
+               <property name="text">
+                <string>标准差:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEditNoiseStd"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButtonAddNoise">
+             <property name="text">
+              <string>叠加噪声</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBoxDisplayMode">
+          <property name="title">
+           <string>显示模式</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QPushButton" name="pushButtonDisplaySwitch">
+             <property name="text">
+              <string>时域/频域 切换</string>
              </property>
             </widget>
            </item>
@@ -79,7 +139,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>616</width>
+     <width>617</width>
      <height>17</height>
     </rect>
    </property>

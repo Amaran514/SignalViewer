@@ -1,7 +1,14 @@
 
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QFile>
+#include <QFileDialog>
+#include <QRegularExpression>
+#include <QRandomGenerator>
 #include <QtMath>
+#include <vector>
+#include <complex>
+#include "fft.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -13,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     settings = new QSettings("setting.ini",QSettings::IniFormat);
     resize(settings->value("Window/width").toInt(), settings->value("Window/hight").toInt());
     ui->lineEditId->setText(settings->value("Id/id").toString());
+    ui->lineEditNoiseMean->setText(settings->value("Noise/mean").toString());
+    ui->lineEditNoiseStd->setText(settings->value("Noise/standardDeviation").toString());
     series = new QLineSeries();
     chart = new QChart();
     chart->addSeries(series);
@@ -32,13 +41,39 @@ MainWindow::~MainWindow()
 void MainWindow::updateView()
 {
     series->clear();
-    chart->axes(Qt::Horizontal).first()->setRange(0, (values.size()-1) / freq_sample);
-    chart->axes(Qt::Vertical).first()->setRange(*std::min_element(values.begin(),values.end())*1.2,*std::max_element(values.begin(),values.end())*1.2);
-    for (int n = 0; n < values.size(); ++n) {
-        series->append(n / freq_sample, values[n]);
+    if (display_mode == 0) {
+        chart->axes(Qt::Horizontal).first()->setRange(0, (values.size()-1) / freq_sample);
+        chart->axes(Qt::Vertical).first()->setRange(*std::min_element(values.begin(),values.end())*1.2, *std::max_element(values.begin(),values.end())*1.2);
+        for (int i = 0; i < values.size(); ++i) {
+            series->append(i / freq_sample, values[i]);
+        }
+    } else if (display_mode == 1) {
+        std::vector<std::complex<double>> freq_spectrum;
+        freq_spectrum.resize(values.size());
+        freq_spectrum.assign(values.begin(), values.end());
+        fft(freq_spectrum, false);
+        QVector<double> freq_mod;
+        freq_mod.resize(freq_spectrum.size());
+        for (int i = 0; i < freq_spectrum.size(); ++i) {
+            freq_mod[i] = sqrt(freq_spectrum[i].real()*freq_spectrum[i].real()+freq_spectrum[i].imag()*freq_spectrum[i].imag());
+        }
+        chart->axes(Qt::Horizontal).first()->setRange(0, freq_sample);
+        chart->axes(Qt::Vertical).first()->setRange(0, *std::max_element(freq_mod.begin(),freq_mod.end())*1.2);
+        for (int i = 0; i < freq_spectrum.size(); ++i) {
+            series->append(i*freq_sample/(freq_mod.size()-1), freq_mod[i]);
+        }
     }
     return;
 }
+
+
+double MainWindow::gaussianRandom(double mean, double stdDev) {
+    double u = QRandomGenerator::global()->generateDouble();
+    double v = QRandomGenerator::global()->generateDouble();
+    double z = sqrt(-2 * log(u)) * cos(2 * M_PI * v);
+    return mean + z * stdDev;
+}
+
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
     settings->setValue("Window/hight", geometry().height());
@@ -84,7 +119,7 @@ void MainWindow::on_pushButtonReadFile_clicked()
                 break;
             }
         }
-        values.resize(100);
+        values.resize(freq_sample/freq_sine*50);
         for (int i = 0; i < values.size(); ++i) {
             values[i] = amplitude * cos(2*M_PI*freq_sine/freq_sample*i);
         }
@@ -118,8 +153,44 @@ void MainWindow::on_pushButtonSaveFile_clicked()
 }
 
 
+void MainWindow::on_pushButtonAddNoise_clicked()
+{
+    double mean = ui->lineEditNoiseMean->text().toDouble();
+    double std = ui->lineEditNoiseStd->text().toDouble();
+    datatype = 2;
+    for (int i = 0; i < values.size(); ++i) {
+        values[i] += gaussianRandom(mean, std);
+    }
+    updateView();
+    return;
+}
+
+
 void MainWindow::on_lineEditId_editingFinished()
 {
     settings->setValue("Id/id", ui->lineEditId->text());
+}
+
+
+void MainWindow::on_lineEditNoiseMean_editingFinished()
+{
+    settings->setValue("Noise/mean", ui->lineEditNoiseMean->text());
+}
+
+
+void MainWindow::on_lineEditNoiseStd_editingFinished()
+{
+    settings->setValue("Noise/standardDeviation", ui->lineEditNoiseStd->text());
+}
+
+
+void MainWindow::on_pushButtonDisplaySwitch_clicked()
+{
+    if (display_mode == 0) {
+        display_mode = 1;
+    } else {
+        display_mode = 0;
+    }
+    updateView();
 }
 

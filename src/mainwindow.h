@@ -5,9 +5,6 @@
 #include <QMainWindow>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
-#include <QFile>
-#include <QFileDialog>
-#include <QRegularExpression>
 #include <QVector>
 #include <QSettings>
 
@@ -31,10 +28,19 @@ private slots:
 
     void on_pushButtonSaveFile_clicked();
 
+    void on_pushButtonAddNoise_clicked();
+
     void on_lineEditId_editingFinished();
+
+    void on_lineEditNoiseMean_editingFinished();
+
+    void on_lineEditNoiseStd_editingFinished();
+
+    void on_pushButtonDisplaySwitch_clicked();
 
 private:
     void updateView();
+    double gaussianRandom(double mean, double stdDev);
     virtual void resizeEvent(QResizeEvent *event) override;
 
     QSettings *settings;
@@ -44,6 +50,7 @@ private:
     QVector<double> values;
     double freq_sample;
     int datatype;  // 0: int16, 1: uint32, 2: float
+    int display_mode = 0;  // 0: time, 1: freq
 };
 
 #endif // MAINWINDOW_H
