@@ -30,9 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
     chart = new QChart();
     chart->addSeries(series);
     chart->createDefaultAxes();
+    axisx = (QValueAxis*)chart->axes(Qt::Horizontal).first();
+    axisy = (QValueAxis*)chart->axes(Qt::Vertical).first();
     chart->legend()->hide();
-    chart->axes(Qt::Horizontal).first()->setRange(0, 160);
-    chart->axes(Qt::Vertical).first()->setRange(0,5);
+    axisx->setRange(0, 160);
+    axisy->setRange(0, 5);
     ui->signalView->setChart(chart);
 }
 
@@ -44,13 +46,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateView()
 {
-    series->clear();
     if (display_mode == 0) {
-        chart->axes(Qt::Horizontal).first()->setRange(0, (values.size()-1) / freq_sample);
-        chart->axes(Qt::Vertical).first()->setRange(*std::min_element(values.begin(),values.end())*1.2, *std::max_element(values.begin(),values.end())*1.2);
+        QVector<QPointF> points;
+        points.reserve(values.size());
         for (int i = 0; i < values.size(); ++i) {
-            series->append(i / freq_sample, values[i]);
+            points.append(QPointF(i / freq_sample, values[i]));
         }
+        axisx->setRange(0, (values.size()-1) / freq_sample);
+        axisy->setRange(*std::min_element(values.begin(),values.end())*1.2, *std::max_element(values.begin(),values.end())*1.2);
+        series->replace(points);
+        axisx->setTitleText("时间/s");
+        axisy->setTitleText("幅度");
+        chart->setTitle("信号时域图");
     } else if (display_mode == 1) {
         std::vector<std::complex<double>> freq_spectrum;
         freq_spectrum.resize(values.size());
@@ -61,11 +68,17 @@ void MainWindow::updateView()
         for (int i = 0; i < freq_spectrum.size(); ++i) {
             freq_mod[i] = sqrt(freq_spectrum[i].real()*freq_spectrum[i].real()+freq_spectrum[i].imag()*freq_spectrum[i].imag());
         }
-        chart->axes(Qt::Horizontal).first()->setRange(0, freq_sample);
-        chart->axes(Qt::Vertical).first()->setRange(0, *std::max_element(freq_mod.begin(),freq_mod.end())*1.2);
-        for (int i = 0; i < freq_spectrum.size(); ++i) {
-            series->append(i*freq_sample/(freq_mod.size()-1), freq_mod[i]);
+        QVector<QPointF> points;
+        points.reserve(freq_mod.size());
+        for (int i = 0; i < freq_mod.size(); ++i) {
+            points.append(QPointF(i*freq_sample/(freq_mod.size()-1), freq_mod[i]));
         }
+        axisx->setRange(0, freq_sample);
+        axisy->setRange(0, *std::max_element(freq_mod.begin(),freq_mod.end())*1.2);
+        series->replace(points);
+        axisx->setTitleText("频率/f");
+        axisy->setTitleText("幅度");
+        chart->setTitle("信号幅度谱");
     }
     return;
 }

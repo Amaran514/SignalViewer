@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
+#include <QtCharts/QValueAxis>
 #include <QVector>
 #include <QSettings>
 
@@ -47,6 +48,8 @@ private:
     Ui::MainWindow *ui;
     QLineSeries *series;
     QChart *chart;
+    QValueAxis *axisx;
+    QValueAxis *axisy;
     QVector<double> values;
     double freq_sample;
     int datatype;  // 0: int16, 1: uint32, 2: float
